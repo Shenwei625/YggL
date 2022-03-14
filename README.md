@@ -46,6 +46,7 @@ echo "
 + Gammaproteobacteria
 
 Old ones: Cellvibrionales, Oceanospirillales, Pseudomonadales, and Alteromonadales
+
 New ones: Moraxellales, Kangiellales, and Pseudomonadales
 ```bash
 SPECIES=$(
