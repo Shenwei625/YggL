@@ -447,6 +447,7 @@ nw_reroot YggL/YggL.aln.newick $(nw_labels YggL/YggL.aln.newick | grep -E "B_sub
 ```
 ![](./IMG/YGGL.png)
 
+在物种树中铜绿假单胞菌（红色）聚到一支上，而在蛋白树中，铜绿假单胞菌中的YggL蛋白却明显分为两支
 ### Ka/Ks的测定
 
 
