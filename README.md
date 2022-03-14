@@ -444,6 +444,7 @@ nw_reroot YggL/YggL.aln.newick $(nw_labels YggL/YggL.aln.newick | grep -E "B_sub
     nw_order -c n - \
     > YggL/YggL.reoot.newick
 ```
+![](./IMG/YggL.png)
 
 ### Ka/Ks的测定
 
