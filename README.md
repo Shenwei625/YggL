@@ -349,7 +349,7 @@ done
 nw_display -s -b 'visibility:hidden' -w 600 -v 30 mash.species.newick |
     rsvg-convert -o Pseudomonas.mash.png
 ```
-![](./IMG/1526.png)
+![](./IMG/LABEL.png)
 
 ## 计算YggL在每个菌株中的拷贝数
 + hmmersearch的使用
