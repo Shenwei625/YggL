@@ -181,9 +181,9 @@ cat ASSEMBLY/rsync.tsv |
 ## 物种树
 + 筛选 
 
-* Check N50 of assemblies
+Check N50 of assemblies
 
-* Some strains were anomalously labeled and identified by the `mash` tree.
+Some strains were anomalously labeled and identified by the `mash` tree.
     * Pseudom_flu_GCF_900636635_1
     * Pseudom_chl_GCF_001023535_1
     * Pseudom_syr_GCF_004006335_1
