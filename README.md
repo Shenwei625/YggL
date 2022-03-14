@@ -350,6 +350,12 @@ nw_display -s -b 'visibility:hidden' -w 600 -v 30 mash.species.newick |
 ```
 
 ## 计算YggL在每个菌株中的拷贝数
++ hmmersearch的使用
+```
+Usage: hmmsearch [options] <hmmfile> <seqdb>
+用法：hmmsearch 参数 hmm文件 序列数据库
+```
+
 
 
 ## 蛋白树构建
