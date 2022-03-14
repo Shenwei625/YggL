@@ -178,8 +178,24 @@ cat ASSEMBLY/rsync.tsv |
     ' |
     grep -v ": OK"
 ```
+## 模式细菌的物种树
+```bash
+mkdir -p model
+cd model
 
-## 物种树
+#提取模式生物基因
+cat ../reference.tsv | cut -f 4 | sed '1d' | cut -d "." -f 1 > out.lst  #15
+find ../ASSEMBLY -maxdepth 2 -name "*_genomic.fna.gz" | grep -v "from" > genome.lst
+gzip -dcf $(cat genome.lst | grep -f out.lst) > out.fa    
+cat out.fa | grep ">" | grep -v "plasmid" | wc -l
+# 15
+```
++ MinHash
+
+
+
+
+## 所有物种的物种树
 + 筛选 
 
 * Check N50 of assemblies
@@ -356,9 +372,52 @@ nw_display -s -b 'visibility:hidden' -w 600 -v 30 mash.species.newick |
 ```
 Usage: hmmsearch [options] <hmmfile> <seqdb>
 用法：hmmsearch 参数 hmm文件 序列数据库
+
+mkdir -p YggL/HMM  #存放YggL蛋白的结构域文件
+curl -L http://pfam.xfam.org/family/PF04320/hmm > YggL/HMM/YggL_50S_bp.hmm
+curl -L www.pantherdb.org/panther/exportHmm.jsp?acc=PTHR38778 > YggL/HMM/PTHR38778.hmm
+
+# 比对
+E_VALUE=1e-20
+for domain in YggL_50S_bp PTHR38778; do
+    >&2 echo "==> domain [${domain}]"
+
+    if [ -e YggL/${domain}.replace.tsv ]; then
+        continue;
+    fi
+
+    for GENUS in $(cat genus.lst); do
+        >&2 echo "==> GENUS [${GENUS}]"
+
+        for STRAIN in $(cat taxon/${GENUS}); do
+            gzip -dcf ASSEMBLY/${STRAIN}/*_protein.faa.gz |
+                hmmsearch -E ${E_VALUE} --domE ${E_VALUE} --noali --notextw YggL/HMM/${domain}.hmm - |
+                grep '>>' |
+                STRAIN=${STRAIN} perl -nl -e '
+                    />>\s+(\S+)/ or next;
+                    $n = $1;
+                    $s = $n;
+                    $s =~ s/\.\d+//;
+                    printf qq{%s\t%s_%s\n}, $n, $ENV{STRAIN}, $s;
+                '
+        done
+    done \
+        > YggL/${domain}.replace.tsv
+
+    >&2 echo
+done
+
+tsv-join YggL/YggL_50S_bp.replace.tsv \
+    -f YggL/PTHR38778.replace.tsv \
+    > YggL/YggL.replace.tsv
 ```
-
-
++ 统计
+```bash
+cd YggL
+cat YggL.replace.tsv | cut -f 2 > protine.txt
+cat ../PROTEINS/all.strain.tsv | grep -f protine.txt | cut -f 2 > statistic.txt
+perl statistics.pl
+```
 
 ## 蛋白树构建
 + 提取所有蛋白
