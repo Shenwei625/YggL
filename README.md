@@ -240,11 +240,6 @@ cat dist_full.tsv |
 ```
 ![](./IMG/model_1.png)
 
-## 模式生物的YggL蛋白树
-
-
-
-
 ## 所有物种的物种树
 + 筛选 
 
@@ -469,7 +464,7 @@ cat ../PROTEINS/all.strain.tsv | grep -f protine.txt | cut -f 2 > statistic.txt
 perl statistics.pl
 ```
 
-## 蛋白树构建
+## YggL蛋白树构建
 + 提取所有蛋白
 ```bash
 mkdir -p PROTEINS
@@ -501,46 +496,42 @@ for STRAIN in $(cat strains.lst); do
 done \
     > PROTEINS/all.replace.fa
 ```
+## 模式生物的蛋白树
+```bash
+mkdir -p model/protein
+cd model/protein
 
+cat YggL/YggL.replace.tsv | 
+    grep -f model/out.lst
+
+NP_417434.4     E_coli_K_12_MG1655_NP_417434
+NP_311862.2     E_coli_O157_H7_Sakai_NP_311862
+YP_005228761.1  K_pne_pneumoniae_HS11286_YP_005228761
+NP_251736.1     Pseudom_aer_PAO1_NP_251736
+NP_250533.1     Pseudom_aer_PAO1_NP_250533
+WP_003091271.1  Pseudom_aer_PAO1_GCF_013001005_1_WP_003091271
+WP_003098191.1  Pseudom_aer_PAO1_GCF_013001005_1_WP_003098191
+NP_462024.1     Sa_ente_enterica_Typhimurium_LT2_NP_462024
+NP_708730.3     Shi_fle_2a_301_NP_708730
+```
+存在两个PAO1的基因组，一个是模式生物中的，一个是铜绿假单胞菌中的？，都含有两个YggL的拷贝，保留其中一个
+
+```bash
+cat YggL/YggL.replace.tsv | 
+    grep -f model/out.lst |
+    grep -v "GCF" > model/protein/model.lst
+
+faops some PROTEINS/all.replace.fa model/protein/model.lst model/protein/model_p.fa
+
+muscle -in model/protein/model_p.fa -out model/protein/out.aln.fa
+
+FastTree model/protein/out.aln.fa > model/protein/out.aln.newick
+```
+
+## 所有菌株的蛋白树
 + 提取YggL蛋白
 ```bash
 mkdir -p YggL/HMM
-
-curl -L http://pfam.xfam.org/family/PF04320/hmm > YggL/HMM/YggL_50S_bp.hmm
-curl -L www.pantherdb.org/panther/exportHmm.jsp?acc=PTHR38778 > YggL/HMM/PTHR38778.hmm
-
-E_VALUE=1e-20
-for domain in YggL_50S_bp PTHR38778; do
-    >&2 echo "==> domain [${domain}]"
-
-    if [ -e YggL/${domain}.replace.tsv ]; then
-        continue;
-    fi
-
-    for GENUS in $(cat genus.lst); do
-        >&2 echo "==> GENUS [${GENUS}]"
-
-        for STRAIN in $(cat taxon/${GENUS}); do
-            gzip -dcf ASSEMBLY/${STRAIN}/*_protein.faa.gz |
-                hmmsearch -E ${E_VALUE} --domE ${E_VALUE} --noali --notextw YggL/HMM/${domain}.hmm - |
-                grep '>>' |
-                STRAIN=${STRAIN} perl -nl -e '
-                    />>\s+(\S+)/ or next;
-                    $n = $1;
-                    $s = $n;
-                    $s =~ s/\.\d+//;
-                    printf qq{%s\t%s_%s\n}, $n, $ENV{STRAIN}, $s;
-                '
-        done
-    done \
-        > YggL/${domain}.replace.tsv
-
-    >&2 echo
-done
-
-tsv-join YggL/YggL_50S_bp.replace.tsv \
-    -f YggL/PTHR38778.replace.tsv \
-    > YggL/YggL.replace.tsv
 
 faops some PROTEINS/all.replace.fa <(tsv-select -f 2 YggL/YggL.replace.tsv) YggL/YggL.fa
 ```
