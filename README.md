@@ -459,6 +459,57 @@ cd YggL
 cat YggL.replace.tsv | cut -f 2 > protine.txt
 cat ../PROTEINS/all.strain.tsv | grep -f protine.txt | cut -f 2 > statistic.txt
 perl statistics.pl
+
+# 将没有YggL的菌株添加到结果文件中
+cat RESULT.txt | cut -f 1 > own.txt
+ZERO=$(cat ../strains.lst | grep -v -f own.txt)
+for Z in $ZERO; do
+    echo -e "$Z\t0" >> RESULT.txt
+    done
+cat RESULT.txt | wc -l
+#1526
+```
++ 统计不同物种中YggL蛋白的数量
+```bah
+mkdir -p ~/data/Pseudomonas/YggL/table
+cd ~/data/Pseudomonas/YggL/table
+
+cat ../../strains.taxon.tsv | cut -f 1,4 > join.tsv
+cat ../RESULT.txt | sort -nr -k2,2 > RESULT.tsv
+
+(echo -e "#name\tnumber" && cat RESULT.tsv) \
+    > tem &&
+    mv tem RESULT.tsv
+
+(echo -e "#name\tspecies" && cat join.tsv) \
+    > tem &&
+    mv tem join.tsv
+
+tsv-join -H --filter-file join.tsv \
+    --key-fields 1 \
+    --append-fields 2 \
+    RESULT.tsv \
+    > number_species.tsv
+```
++ 筛选出菌株数量大于10的物种
+```bash
+cat join.tsv | sed "1d" | cut -f 2 > statistic.txt
+perl ~/data/Pseudomonas/script/statistics.pl
+cat RESULT.txt | tsv-filter --ge 2:10 | cut -f 1 > filter.txt
+
+cat number_species.tsv | 
+    grep -f filter.txt | 
+    cut -f 2,3 > pass.tsv
+
+tsv-summarize --sum 1 \
+    --group-by 2 \
+    pass.tsv > species_number.tsv 
+
+tsv-join --filter-file total.tsv \
+    --key-fields 1 \
+    --append-fields 2 \
+    species_assemblies.tsv \
+    > table.tsv
 ```
 
 ## YggL蛋白树构建
