@@ -238,7 +238,6 @@ cat dist_full.tsv |
         write_tsv(groups, "groups.tsv")
     '
 ```
-![](./IMG/model_1.png)
 
 ## 所有物种的物种树
 + 筛选 
@@ -410,8 +409,6 @@ done
 nw_display -s -b 'visibility:hidden' -w 600 -v 30 mash.species.newick |
     rsvg-convert -o Pseudomonas.mash.png
 ```
-![](./IMG/LABEL.png)
-
 ## 计算YggL在每个菌株中的拷贝数
 + hmmersearch的使用
 ```
@@ -527,7 +524,10 @@ muscle -in model/protein/model_p.fa -out model/protein/out.aln.fa
 
 FastTree model/protein/out.aln.fa > model/protein/out.aln.newick
 ```
+![](./IMG/model_1.png)
+
 ![](./IMG/model_2.png)
+
 ### 所有菌株的蛋白树
 + 提取YggL蛋白
 ```bash
@@ -545,6 +545,8 @@ nw_reroot YggL/YggL.aln.newick $(nw_labels YggL/YggL.aln.newick | grep -E "B_sub
     nw_order -c n - \
     > YggL/YggL.reoot.newick
 ```
+![](./IMG/LABEL.png)
+
 ![](./IMG/YGGL.png)
 
 在物种树中铜绿假单胞菌（红色）聚到一支上，而在蛋白树中，铜绿假单胞菌中的YggL蛋白却明显分为两支
