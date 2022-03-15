@@ -238,7 +238,7 @@ cat dist_full.tsv |
         write_tsv(groups, "groups.tsv")
     '
 ```
-![](./IMG/model_s.png)
+![](./IMG/model_1.png)
 
 ## 模式生物的YggL蛋白树
 
