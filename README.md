@@ -528,6 +528,7 @@ FastTree model/protein/out.aln.fa > model/protein/out.aln.newick
 
 ![](./IMG/model_2.png)
 
+模式菌株PAO1中存在两个YggL拷贝，相对于其他的模式菌株进化距离较远，其中的两个拷贝进化距离也较远
 ### 所有菌株的蛋白树
 + 提取YggL蛋白
 ```bash
