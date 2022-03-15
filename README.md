@@ -178,65 +178,65 @@ cat ASSEMBLY/rsync.tsv |
     ' |
     grep -v ": OK"
 ```
-## 模式细菌的物种树
-+ MinHash
+## 模式细菌的物种树(bac120)
++ 下载bac120的hmm文件
 ```bash
-mkdir -p model
-cd model
+mkdir -p ~/data/HMM/bac120
+cd ~/data/HMM/bac120
 
-cat ../strains.lst | grep -v "GCF" > out.lst
-for strain in $(cat out.lst); do
-    2>&1 echo "==> ${strain}"
+cp ~/Scripts/withncbi/hmm/bac120.tsv ~/data/HMM/bac120/
 
-    if [[ -e ${strain}.msh ]]; then
-        continue
-    fi
+mkdir -p HMM
 
-    find ../ASSEMBLY/${strain} -name "*_genomic.fna.gz" |
-        grep -v "_from_" |
-        xargs cat |
-        mash sketch -k 21 -s 100000 -p 8 - -I "${strain}" -o ${strain}
-done
-
-mash triangle -E -p 8 -l <(
-    cat ./out.lst | parallel echo "{}.msh"
-    ) \
-    > dist.tsv
-
-tsv-select -f 1-3 dist.tsv |
-    (tsv-select -f 2,1,3 dist.tsv && cat) |
-    (
-        cut -f 1 dist.tsv |
-            tsv-uniq |
-            parallel -j 1 --keep-order 'echo -e "{}\t{}\t0"' &&
-        cat
-    ) \
-    > dist_full.tsv
-
-cat dist_full.tsv |
-    Rscript -e '
-        library(readr);
-        library(tidyr);
-        library(ape);
-        pair_dist <- read_tsv(file("stdin"), col_names=F);
-        tmp <- pair_dist %>%
-            pivot_wider( names_from = X2, values_from = X3, values_fill = list(X3 = 1.0) )
-        tmp <- as.matrix(tmp)
-        mat <- tmp[,-1]
-        rownames(mat) <- tmp[,1]
-
-        dist_mat <- as.dist(mat)
-        clusters <- hclust(dist_mat, method = "ward.D2")
-        tree <- as.phylo(clusters)
-        write.tree(phy=tree, file="tree.nwk")
-
-        group <- cutree(clusters, h=0.4) # k=5
-        groups <- as.data.frame(group)
-        groups$ids <- rownames(groups)
-        rownames(groups) <- NULL
-        groups <- groups[order(groups$group), ]
-        write_tsv(groups, "groups.tsv")
+cat ~/Scripts/withncbi/hmm/bac120.tsv |
+    sed '1d' |
+    tsv-select -f 1 |
+    grep '^TIGR' |
+    parallel --no-run-if-empty --linebuffer -k -j 4 '
+        tar --directory HMM -xzvf ../TIGRFAM/TIGRFAMs_14.0_HMM.tar.gz {}.HMM
     '
+
+cat ~/Scripts/withncbi/hmm/bac120.tsv |
+    sed '1d' |
+    tsv-select -f 1 |
+    grep -v '^TIGR' |
+    parallel --no-run-if-empty --linebuffer -k -j 4 '
+        curl -L http://pfam.xfam.org/family/{}/hmm > HMM/{}.HMM
+    '
+```
+```bash
+E_VALUE=1e-20
+
+cd ~/data/Pseudomonas
+
+# Find all genes
+for marker in $(cat ~/data/HMM/bac120/bac120.tsv | sed '1d' | cut -f 1); do
+    echo "==> marker [${marker}]"
+
+    mkdir -p PROTEINS/${marker}
+
+    for GENUS in $(cat genus.lst); do
+        echo "==> GENUS [${GENUS}]"
+
+        for STRAIN in $(cat taxon/${GENUS}); do
+            gzip -dcf ASSEMBLY/${STRAIN}/*_protein.faa.gz |
+                hmmsearch -E ${E_VALUE} --domE ${E_VALUE} --noali --notextw ~/data/HMM/bac120/HMM/${marker}.HMM - |
+                grep '>>' |
+                STRAIN=${STRAIN} perl -nl -e '
+                    />>\s+(\S+)/ and printf qq{%s\t%s\n}, $1, $ENV{STRAIN};
+                '
+        done \
+            > PROTEINS/${marker}/${GENUS}.replace.tsv
+    done
+
+    echo
+done
+```
+```bash
+mkdir ~/data/Pseudomonas/model
+cd ~/data/Pseudomonas/model
+
+
 ```
 
 ## 所有物种的物种树
@@ -410,12 +410,12 @@ nw_display -s -b 'visibility:hidden' -w 600 -v 30 mash.species.newick |
     rsvg-convert -o Pseudomonas.mash.png
 ```
 ## 计算YggL在每个菌株中的拷贝数
-+ hmmersearch的使用
+### hmmersearch
 ```bash
 Usage: hmmsearch [options] <hmmfile> <seqdb>
 用法：hmmsearch 参数 hmm文件 序列数据库
 
-mkdir -p YggL/HMM  #存放YggL蛋白的结构域文件
+mkdir -p YggL/HMM  #存放YggL蛋白的hmm文件(两个数据库)
 curl -L http://pfam.xfam.org/family/PF04320/hmm > YggL/HMM/YggL_50S_bp.hmm
 curl -L www.pantherdb.org/panther/exportHmm.jsp?acc=PTHR38778 > YggL/HMM/PTHR38778.hmm
 
@@ -511,6 +511,9 @@ tsv-join --filter-file total.tsv \
     species_assemblies.tsv \
     > table.tsv
 ```
+### Blastp
+
+
 
 ## YggL蛋白树构建
 + 提取所有蛋白
@@ -550,22 +553,6 @@ mkdir -p model/protein
 cd model/protein
 
 cat YggL/YggL.replace.tsv | 
-    grep -f model/out.lst
-
-NP_417434.4     E_coli_K_12_MG1655_NP_417434
-NP_311862.2     E_coli_O157_H7_Sakai_NP_311862
-YP_005228761.1  K_pne_pneumoniae_HS11286_YP_005228761
-NP_251736.1     Pseudom_aer_PAO1_NP_251736
-NP_250533.1     Pseudom_aer_PAO1_NP_250533
-WP_003091271.1  Pseudom_aer_PAO1_GCF_013001005_1_WP_003091271
-WP_003098191.1  Pseudom_aer_PAO1_GCF_013001005_1_WP_003098191
-NP_462024.1     Sa_ente_enterica_Typhimurium_LT2_NP_462024
-NP_708730.3     Shi_fle_2a_301_NP_708730
-```
-存在两个PAO1的基因组，一个是模式生物中的，一个是铜绿假单胞菌中的？，都含有两个YggL的拷贝，保留其中一个
-
-```bash
-cat YggL/YggL.replace.tsv | 
     grep -f model/out.lst |
     grep -v "GCF" > model/protein/model.lst
 
@@ -575,11 +562,7 @@ muscle -in model/protein/model_p.fa -out model/protein/out.aln.fa
 
 FastTree model/protein/out.aln.fa > model/protein/out.aln.newick
 ```
-![](./IMG/model_1.png)
 
-![](./IMG/model_2.png)
-
-模式菌株PAO1中存在两个YggL拷贝，相对于其他的模式菌株进化距离较远，其中的两个拷贝进化距离也较远
 ### 所有菌株的蛋白树
 + 提取YggL蛋白
 ```bash
