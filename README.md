@@ -179,18 +179,68 @@ cat ASSEMBLY/rsync.tsv |
     grep -v ": OK"
 ```
 ## 模式细菌的物种树
++ MinHash
 ```bash
 mkdir -p model
 cd model
 
-#提取模式生物基因
-cat ../reference.tsv | cut -f 4 | sed '1d' | cut -d "." -f 1 > out.lst  #15
-find ../ASSEMBLY -maxdepth 2 -name "*_genomic.fna.gz" | grep -v "from" > genome.lst
-gzip -dcf $(cat genome.lst | grep -f out.lst) > out.fa    
-cat out.fa | grep ">" | grep -v "plasmid" | wc -l
-# 15
+cat ../strains.lst | grep -v "GCF" > out.lst
+for strain in $(cat out.lst); do
+    2>&1 echo "==> ${strain}"
+
+    if [[ -e ${strain}.msh ]]; then
+        continue
+    fi
+
+    find ../ASSEMBLY/${strain} -name "*_genomic.fna.gz" |
+        grep -v "_from_" |
+        xargs cat |
+        mash sketch -k 21 -s 100000 -p 8 - -I "${strain}" -o ${strain}
+done
+
+mash triangle -E -p 8 -l <(
+    cat ./out.lst | parallel echo "{}.msh"
+    ) \
+    > dist.tsv
+
+tsv-select -f 1-3 dist.tsv |
+    (tsv-select -f 2,1,3 dist.tsv && cat) |
+    (
+        cut -f 1 dist.tsv |
+            tsv-uniq |
+            parallel -j 1 --keep-order 'echo -e "{}\t{}\t0"' &&
+        cat
+    ) \
+    > dist_full.tsv
+
+cat dist_full.tsv |
+    Rscript -e '
+        library(readr);
+        library(tidyr);
+        library(ape);
+        pair_dist <- read_tsv(file("stdin"), col_names=F);
+        tmp <- pair_dist %>%
+            pivot_wider( names_from = X2, values_from = X3, values_fill = list(X3 = 1.0) )
+        tmp <- as.matrix(tmp)
+        mat <- tmp[,-1]
+        rownames(mat) <- tmp[,1]
+
+        dist_mat <- as.dist(mat)
+        clusters <- hclust(dist_mat, method = "ward.D2")
+        tree <- as.phylo(clusters)
+        write.tree(phy=tree, file="tree.nwk")
+
+        group <- cutree(clusters, h=0.4) # k=5
+        groups <- as.data.frame(group)
+        groups$ids <- rownames(groups)
+        rownames(groups) <- NULL
+        groups <- groups[order(groups$group), ]
+        write_tsv(groups, "groups.tsv")
+    '
 ```
-+ MinHash
+![](./IMG/model_s.png)
+
+## 模式生物的YggL蛋白树
 
 
 
