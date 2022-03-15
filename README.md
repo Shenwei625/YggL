@@ -496,7 +496,7 @@ for STRAIN in $(cat strains.lst); do
 done \
     > PROTEINS/all.replace.fa
 ```
-## 模式生物的蛋白树
+### 模式生物的蛋白树
 ```bash
 mkdir -p model/protein
 cd model/protein
@@ -528,7 +528,7 @@ muscle -in model/protein/model_p.fa -out model/protein/out.aln.fa
 FastTree model/protein/out.aln.fa > model/protein/out.aln.newick
 ```
 ![](./IMG/model_2.png)
-## 所有菌株的蛋白树
+### 所有菌株的蛋白树
 + 提取YggL蛋白
 ```bash
 mkdir -p YggL/HMM
