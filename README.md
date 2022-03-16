@@ -294,9 +294,23 @@ fasops concat PROTEINS/bac120.model.aln.fas model/model.lst -o PROTEINS/bac120.m
 # Trim poorly aligned regions with `TrimAl`
 trimal -in PROTEINS/bac120.model.aln.fa -out PROTEINS/bac120.model.trim.fa -automated1
 
+# renname Cam_jej_jejuni_NCTC_11168_ATCC_700819 
+sed -e "s/Cam_jej_jejuni_NCTC_11168_ATCC_700819/Cam_jej_jejuni_NCTC_11168/" PROTEINS/bac120.model.trim.fa > PROTEINS/bac120.model.rename.fa
+
 # To make it faster
-FastTree -fastest -noml PROTEINS/bac120.model.trim.fa > PROTEINS/bac120.model.trim.newick
+FastTree -fastest -noml PROTEINS/bac120.model.rename.fa > PROTEINS/bac120.model.newick
 ```
++ 调整进化树
+```bash
+cd ~/data/Pseudomonas/tree
+
+nw_reroot ../PROTEINS/bac120.model.newick B_sub_subtilis_168 St_aur_aureus_NCTC_8325 |
+    nw_order -c n - \
+    > bac120.model.reroot.newick
+```
+
+
+
 ## 所有物种的物种树
 + 筛选 
 
