@@ -308,7 +308,7 @@ nw_reroot ../PROTEINS/bac120.model.newick B_sub_subtilis_168 St_aur_aureus_NCTC_
     nw_order -c n - \
     > bac120.model.reroot.newick
 ```
-
+![](./IMG/model_m.png)
 
 
 ## 所有物种的物种树
