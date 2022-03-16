@@ -524,6 +524,15 @@ done
 tsv-join YggL/YggL_50S_bp.replace.tsv \
     -f YggL/PTHR38778.replace.tsv \
     > YggL/YggL.replace.tsv
+
+cat YggL/YggL.replace.tsv | grep -v "GCF"
+NP_417434.4     E_coli_K_12_MG1655_NP_417434
+NP_311862.2     E_coli_O157_H7_Sakai_NP_311862
+YP_005228761.1  K_pne_pneumoniae_HS11286_YP_005228761
+NP_251736.1     Pseudom_aer_PAO1_NP_251736
+NP_250533.1     Pseudom_aer_PAO1_NP_250533
+NP_462024.1     Sa_ente_enterica_Typhimurium_LT2_NP_462024
+NP_708730.3     Shi_fle_2a_301_NP_708730
 ```
 + 统计
 ```bash
@@ -584,7 +593,29 @@ tsv-join --filter-file total.tsv \
     > table.tsv
 ```
 ### Blastp
+```bash
+mkdir -p ~/data/Pseudomonas/blastp
+cd ~/data/Pseudomonas/blastp
 
+# 检索yggl的蛋白质序列并下载
+cat << 'EOF' > yggl.fa
+>NP_417434.4 putative ribosome assembly factor YggL [Escherichia coli str. K-12 substr. MG1655]
+MAKNRSRRLRKKMHIDEFQELGFSVAWRFPEGTSEEQIDKTVDDFINEVIEPNKLAFDGSGYLAWEGLICMQEIGKCTEEHQAIVRKWLEERKLDEVRTSELFDVWWD
+EOF
+
+makeblastdb -in ./yggl.fa -dbtype prot -parse_seqids -out ./index
+
+blastp -query ../PROTEINS/all.replace.fa -db ./index -evalue 1e-6 -outfmt 6 -num_threads 6 -out out_file
+
+cat out_file | grep -v "GCF" | cut -f 1,2
+E_coli_K_12_MG1655_NP_417434    NP_417434.4
+E_coli_O157_H7_Sakai_NP_311862  NP_417434.4
+K_pne_pneumoniae_HS11286_YP_005228761   NP_417434.4
+Pseudom_aer_PAO1_NP_250533      NP_417434.4
+Pseudom_aer_PAO1_NP_251736      NP_417434.4
+Sa_ente_enterica_Typhimurium_LT2_NP_462024      NP_417434.4
+Shi_fle_2a_301_NP_708730        NP_417434.4
+```
 
 
 ## YggL蛋白树构建
