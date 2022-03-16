@@ -652,18 +652,19 @@ done \
 ```
 ### 模式生物的蛋白树
 ```bash
-mkdir -p model/protein
-cd model/protein
+mkdir -p ~/data/Pseudomonas/model/protein
+cd ~/data/Pseudomonas/model/protein
 
-cat YggL/YggL.replace.tsv | 
-    grep -f model/out.lst |
-    grep -v "GCF" > model/protein/model.lst
+cat ../../YggL/YggL.replace.tsv | 
+    grep -f ../model.lst |
+    grep -v "GCF" | 
+    cut -f 2 > filter.lst
 
-faops some PROTEINS/all.replace.fa model/protein/model.lst model/protein/model_p.fa
+faops some ../../PROTEINS/all.replace.fa filter.lst model.pro.fa
 
-muscle -in model/protein/model_p.fa -out model/protein/out.aln.fa
+muscle -in model.pro.fa -out model.aln.fa
 
-FastTree model/protein/out.aln.fa > model/protein/out.aln.newick
+FastTree model.aln.fa > model.aln.newick
 ```
 
 ### 所有菌株的蛋白树
