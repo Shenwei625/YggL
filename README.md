@@ -684,7 +684,7 @@ nw_reroot YggL/YggL.aln.newick $(nw_labels YggL/YggL.aln.newick | grep -E "B_sub
 ```
 ![](./IMG/model_m.png)
 
-![](./IMG/model_p.png)
+![](./IMG/modelp.png)
 
 ![](./IMG/LABEL.png)
 
