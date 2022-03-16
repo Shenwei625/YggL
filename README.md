@@ -559,10 +559,7 @@ Shi_fle_2a_301_NP_708730        NP_417434.4
 #与hmmsearch结果相符，只在6个模式菌株中检测到了yggl蛋白
 ```
 
-
-
-
-+ 统计
++ hummsearch统计
 ```bash
 cd YggL
 cat YggL.replace.tsv | cut -f 2 > protine.txt
@@ -578,8 +575,7 @@ for Z in $ZERO; do
 cat RESULT.txt | wc -l
 #1526
 ```
-+ 统计不同物种中YggL蛋白的数量
-```bah
+```bash
 mkdir -p ~/data/Pseudomonas/YggL/table
 cd ~/data/Pseudomonas/YggL/table
 
@@ -600,32 +596,34 @@ tsv-join -H --filter-file join.tsv \
     RESULT.tsv \
     > number_species.tsv
 ```
-+ 筛选出菌株数量大于10的物种
 ```bash
-cat join.tsv | sed "1d" | cut -f 2 > statistic.txt
-perl ~/data/Pseudomonas/script/statistics.pl
-cat RESULT.txt | tsv-filter --ge 2:10 | cut -f 1 > filter.txt
-
 cat number_species.tsv | 
-    grep -f filter.txt | 
-    cut -f 2,3 > pass.tsv
-
-tsv-summarize --sum 1 \
+    cut -f 2,3 > statistic.tsv
+    
+tsv-summarize -H \
+    --sum 1 \
     --group-by 2 \
-    pass.tsv > species_number.tsv 
+    statistic.tsv > species_number.tsv     
 
-tsv-join --filter-file total.tsv \
+cat join.tsv | cut -f 2 | sed '1d' > statistic.txt
+perl ~/data/Pseudomonas/script/statistics.pl
+
+(echo -e "species\tnumber of assemblies" && cat RESULT.txt) \
+    > tem &&
+    mv tem species_assembly.tsv
+
+tsv-join --filter-file species_number.tsv \
     --key-fields 1 \
     --append-fields 2 \
-    species_assemblies.tsv \
+    species_assembly.tsv \
     > table.tsv
+
+cat table.tsv | tr "\t" "," > table.csv
 ```
-
-
-
-
-
-
++ 利用excel计算average per genome
+```bash
+cat table.csv | tr "," "\t" > table.tsv
+```
 ## YggL蛋白树构建
 + 提取所有蛋白
 ```bash
