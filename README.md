@@ -308,8 +308,6 @@ nw_reroot ../PROTEINS/bac120.model.newick B_sub_subtilis_168 St_aur_aureus_NCTC_
     nw_order -c n - \
     > bac120.model.reroot.newick
 ```
-![](./IMG/model_m.png)
-
 
 ## 所有物种的物种树
 + 筛选 
@@ -684,6 +682,10 @@ nw_reroot YggL/YggL.aln.newick $(nw_labels YggL/YggL.aln.newick | grep -E "B_sub
     nw_order -c n - \
     > YggL/YggL.reoot.newick
 ```
+![](./IMG/model_m.png)
+
+![](./IMG/model_p.png)
+
 ![](./IMG/LABEL.png)
 
 ![](./IMG/YGGL.png)
