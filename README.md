@@ -236,9 +236,67 @@ done
 mkdir ~/data/Pseudomonas/model
 cd ~/data/Pseudomonas/model
 
-
+cat ../strains.taxon.tsv |
+    grep -v "GCF" | 
+    cut -f 1 > model.lst    
 ```
+```bash
+cd ~/data/Pseudomonas
 
+# Extract sequences
+cat ~/data/HMM/bac120/bac120.tsv | sed '1d' | cut -f 1 |
+    parallel --no-run-if-empty --linebuffer -k -j 4 '
+        >&2 echo "==> marker [{}]"
+        
+        cat PROTEINS/{}/{}.replace.tsv |
+            grep -f model/model.lst | 
+            grep -v "GCF" > PROTEINS/{}/{}.model.tsv
+       
+       faops some PROTEINS/all.uniq.fa <(
+            cat PROTEINS/{}/{}.model.tsv |
+                cut -f 1 |
+                tsv-uniq
+            ) stdout \
+            > PROTEINS/{}/{}.model.fa
+    '
+
+# Align each markers with muscle
+cat ~/data/HMM/bac120/bac120.tsv | sed '1d' | cut -f 1 |
+    parallel --no-run-if-empty --linebuffer -k -j 4 '
+        >&2 echo "==> marker [{}]"
+
+        muscle -quiet -in PROTEINS/{}/{}.model.fa -out PROTEINS/{}/{}.model.aln.fa
+    '
+
+for marker in $(cat ~/data/HMM/bac120/bac120.tsv | sed '1d' | cut -f 1); do
+    >&2 echo "==> marker [${marker}]"
+
+    # 1 name to many names
+    cat PROTEINS/${marker}/${marker}.model.tsv |
+        parallel --no-run-if-empty --linebuffer -k -j 4 "
+            faops replace -s PROTEINS/${marker}/${marker}.model.aln.fa <(echo {}) stdout
+        " \
+        > PROTEINS/${marker}/${marker}.model.replace.fa
+done
+
+# Concat marker genes
+for marker in $(cat ~/data/HMM/bac120/bac120.tsv | sed '1d' | cut -f 1); do
+    # sequences in one line
+    faops filter -l 0 PROTEINS/${marker}/${marker}.model.replace.fa stdout
+
+    # empty line for .fas
+    echo
+done \
+    > PROTEINS/bac120.model.aln.fas
+
+fasops concat PROTEINS/bac120.model.aln.fas model/model.lst -o PROTEINS/bac120.model.aln.fa
+
+# Trim poorly aligned regions with `TrimAl`
+trimal -in PROTEINS/bac120.model.aln.fa -out PROTEINS/bac120.model.trim.fa -automated1
+
+# To make it faster
+FastTree -fastest -noml PROTEINS/bac120.model.trim.fa > PROTEINS/bac120.model.trim.newick
+```
 ## 所有物种的物种树
 + 筛选 
 
