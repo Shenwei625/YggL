@@ -620,9 +620,9 @@ tsv-join --filter-file species_number.tsv \
 
 cat table.tsv | tr "\t" "," > table.csv
 ```
-+ 利用excel计算average per genome
++ 筛选
 ```bash
-cat table.csv | tr "," "\t" > table.tsv
+cat table.tsv | tsv-filter -H --ge 2:5 > ge5.tsv
 ```
 ## YggL蛋白树构建
 + 提取所有蛋白
