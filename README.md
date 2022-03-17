@@ -533,32 +533,6 @@ NP_462024.1     Sa_ente_enterica_Typhimurium_LT2_NP_462024
 NP_708730.3     Shi_fle_2a_301_NP_708730
 #在6个模式菌株中检测到yggl蛋白
 ```
-### Blastp
-```bash
-mkdir -p ~/data/Pseudomonas/blastp
-cd ~/data/Pseudomonas/blastp
-
-# 检索yggl的蛋白质序列并下载
-cat << 'EOF' > yggl.fa
->NP_417434.4 putative ribosome assembly factor YggL [Escherichia coli str. K-12 substr. MG1655]
-MAKNRSRRLRKKMHIDEFQELGFSVAWRFPEGTSEEQIDKTVDDFINEVIEPNKLAFDGSGYLAWEGLICMQEIGKCTEEHQAIVRKWLEERKLDEVRTSELFDVWWD
-EOF
-
-makeblastdb -in ./yggl.fa -dbtype prot -parse_seqids -out ./index
-
-blastp -query ../PROTEINS/all.replace.fa -db ./index -evalue 1e-6 -outfmt 6 -num_threads 6 -out out_file
-
-cat out_file | grep -v "GCF" | cut -f 1,2
-E_coli_K_12_MG1655_NP_417434    NP_417434.4
-E_coli_O157_H7_Sakai_NP_311862  NP_417434.4
-K_pne_pneumoniae_HS11286_YP_005228761   NP_417434.4
-Pseudom_aer_PAO1_NP_250533      NP_417434.4
-Pseudom_aer_PAO1_NP_251736      NP_417434.4
-Sa_ente_enterica_Typhimurium_LT2_NP_462024      NP_417434.4
-Shi_fle_2a_301_NP_708730        NP_417434.4
-#与hmmsearch结果相符，只在6个模式菌株中检测到了yggl蛋白
-```
-
 + hummsearch统计
 ```bash
 cd YggL
@@ -623,6 +597,86 @@ cat table.tsv | tr "\t" "," > table.csv
 + 筛选
 ```bash
 cat table.tsv | tsv-filter -H --ge 2:5 > ge5.tsv
+```
+### Blastp
+```bash
+mkdir -p ~/data/Pseudomonas/blastp
+cd ~/data/Pseudomonas/blastp
+
+# 检索yggl的蛋白质序列并下载
+cat << 'EOF' > yggl.fa
+>NP_417434.4 putative ribosome assembly factor YggL [Escherichia coli str. K-12 substr. MG1655]
+MAKNRSRRLRKKMHIDEFQELGFSVAWRFPEGTSEEQIDKTVDDFINEVIEPNKLAFDGSGYLAWEGLICMQEIGKCTEEHQAIVRKWLEERKLDEVRTSELFDVWWD
+EOF
+
+makeblastdb -in ./yggl.fa -dbtype prot -parse_seqids -out ./index
+
+blastp -query ../PROTEINS/all.replace.fa -db ./index -evalue 1e-10 -outfmt 6 -num_threads 6 -out out_file
+
+cat out_file | grep -v "GCF" | cut -f 1,2
+E_coli_K_12_MG1655_NP_417434    NP_417434.4
+E_coli_O157_H7_Sakai_NP_311862  NP_417434.4
+K_pne_pneumoniae_HS11286_YP_005228761   NP_417434.4
+Pseudom_aer_PAO1_NP_250533      NP_417434.4
+Pseudom_aer_PAO1_NP_251736      NP_417434.4
+Sa_ente_enterica_Typhimurium_LT2_NP_462024      NP_417434.4
+Shi_fle_2a_301_NP_708730        NP_417434.4
+#与hmmsearch结果相符，只在6个模式菌株中检测到了yggl蛋白
+```
++ blastp统计
+```bash
+mkdir -p table
+cd  table
+
+cat ../out_file | cut -f 1 > protein.tsv
+cat ../../PROTEINS/all.strain.tsv |
+    grep -f protein.tsv > protein.strain.tsv
+
+cat protein.strain.tsv | cut -f 2 > statistic.txt
+perl statistics.pl
+
+cat ../RESULT.txt | sort -nr -k2,2 > RESULT.tsv
+cat ../../strains.taxon.tsv | cut -f 1,4 > join.tsv
+
+(echo -e "#name\tnumber" && cat RESULT.tsv) \
+    > tem &&
+    mv tem RESULT.tsv
+
+(echo -e "#name\tspecies" && cat join.tsv) \
+    > tem &&
+    mv tem join.tsv
+
+tsv-join -H --filter-file join.tsv \
+    --key-fields 1 \
+    --append-fields 2 \
+    RESULT.tsv \
+    > number_species.tsv
+    
+cat number_species.tsv | 
+    cut -f 2,3 > statistic.tsv  
+
+tsv-summarize -H \
+    --sum 1 \
+    --group-by 2 \
+    statistic.tsv > species_number.tsv 
+```
+```bash
+cat join.tsv | cut -f 2 | sed '1d' > statistic.txt
+perl ~/data/Pseudomonas/script/statistics.pl
+
+(echo -e "species\tnumber of assemblies" && cat RESULT.txt) \
+    > tem &&
+    mv tem species_assembly.tsv
+
+tsv-join --filter-file species_number.tsv \
+    --key-fields 1 \
+    --append-fields 2 \
+    species_assembly.tsv \
+    > table.tsv
+
+cat table.tsv | tr "\t" "," > table.csv
+# 与hummsearch的结果基本一致
+在blastp（evalue：1e-10）中9株Shewanella putrefaciens存在12个拷贝而hummsearch结果显示为11个拷贝
 ```
 ## YggL蛋白树构建
 + 提取所有蛋白
