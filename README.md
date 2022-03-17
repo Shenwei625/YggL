@@ -748,6 +748,27 @@ nw_reroot YggL/YggL.aln.newick $(nw_labels YggL/YggL.aln.newick | grep -E "B_sub
 
 ![](./IMG/modelp.png)
 
+## 合并模式菌株的蛋白树和物种树
++ 利用R的ape包中的cophyloplot函数
+```bash
+cd ~/data/Pseudomonas/model/protein
+cp ../../tree/bac120.model.reroot.newick ./
+
+#以铜绿假单胞菌画根
+nw_reroot bac120.trim.newick $(nw_labels bac120.trim.newick | grep "PAO1") > bac120.protein.newick
+
+R
+library(ape)
+tree1=read.tree("bac120.model.reroot.newick")
+tree2=read.tree("bac120.protein.newick")
+cophyloplot(tree1, tree2, length.line=4, space=28, gap=3, rotate=TRUE)
+```
+![](./IMG/merge1.png)
+
+![](./IMG/merge2.png)
+
+如果添加线条需要更改蛋白树中label的名称使其与物种树一致，如何添加标尺？？？
+
 ![](./IMG/LABEL.png)
 
 ![](./IMG/YGGL.png)
