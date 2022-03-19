@@ -599,6 +599,7 @@ cat table.tsv | tr "\t" "," > table.csv
 cat table.tsv | tsv-filter -H --ge 2:5 > ge5.tsv
 ```
 ### Blastp
++ 第一次检索
 ```bash
 mkdir -p ~/data/Pseudomonas/blastp
 cd ~/data/Pseudomonas/blastp
@@ -612,17 +613,29 @@ EOF
 makeblastdb -in ./yggl.fa -dbtype prot -parse_seqids -out ./index
 
 blastp -query ../PROTEINS/all.replace.fa -db ./index -evalue 1e-10 -outfmt 6 -num_threads 6 -out out_file
-
-cat out_file | grep -v "GCF" | cut -f 1,2
-E_coli_K_12_MG1655_NP_417434    NP_417434.4
-E_coli_O157_H7_Sakai_NP_311862  NP_417434.4
-K_pne_pneumoniae_HS11286_YP_005228761   NP_417434.4
-Pseudom_aer_PAO1_NP_250533      NP_417434.4
-Pseudom_aer_PAO1_NP_251736      NP_417434.4
-Sa_ente_enterica_Typhimurium_LT2_NP_462024      NP_417434.4
-Shi_fle_2a_301_NP_708730        NP_417434.4
-#与hmmsearch结果相符，只在6个模式菌株中检测到了yggl蛋白
 ```
++ 以第一次检索结果为种子序列，进一步进行检索
+```bash
+mkdir -p seed1
+cd seed1
+
+cat ../out_file | cut -f 1 > seed1.lst
+faops ../../PROTEINS/all.replace.fa seed1.lst seed1_raw.fa
+
+#一些序列名称太长，无法建库，删去，只保留一个序列seed1
+cat seed1_raw.fa | grep -v ">" > seed1.fa
+(echo -e ">seed1" && cat see1.fa) \
+    > tem &&
+    mv tem seed1.fa
+#cat seed1.fa | wc -l  2625
+#cat seed1.lst |wc -l 1312
+#cat seed1_raw.fa | wc -l 3936
+
+makeblastdb -in ./seed1.fa -dbtype prot -parse_seqids -out ./index
+
+blastp -query ../../PROTEINS/all.replace.fa -db ./index -evalue 1e-5 -outfmt 6 -num_threads 6 -out out_file
+```
+
 + blastp统计
 ```bash
 mkdir -p table
