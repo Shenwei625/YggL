@@ -624,7 +624,7 @@ faops ../../PROTEINS/all.replace.fa seed1.lst seed1_raw.fa
 
 #一些序列名称太长，无法建库，删去，只保留一个序列seed1
 cat seed1_raw.fa | grep -v ">" > seed1.fa
-(echo -e ">seed1" && cat see1.fa) \
+(echo -e ">seed1" && cat seed1.fa) \
     > tem &&
     mv tem seed1.fa
 #cat seed1.fa | wc -l  2625
