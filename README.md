@@ -763,7 +763,7 @@ tree1=read.tree("bac120.model.reroot.newick")
 tree2=read.tree("bac120.protein.newick")
 cophyloplot(tree1, tree2, length.line=4, space=28, gap=3, rotate=TRUE)
 ```
-![](./IMG/merge1.png)
+![](./IMG/merge2.png)
 
 + 利用R的ggtree包合并两棵树
 ```bash
