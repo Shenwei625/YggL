@@ -765,9 +765,36 @@ cophyloplot(tree1, tree2, length.line=4, space=28, gap=3, rotate=TRUE)
 ```
 ![](./IMG/merge1.png)
 
-![](./IMG/merge2.png)
++ 利用R的ggtree包合并两棵树
+```bash
+cd ~/data/Pseudomonas/model/protein
+cp ../../tree/bac120.model.reroot.newick ./
 
-如果添加线条需要更改蛋白树中label的名称使其与物种树一致，如何添加标尺？？？
+#以铜绿假单胞菌画根
+nw_reroot bac120.trim.newick $(nw_labels bac120.trim.newick | grep "PAO1") > bac120.protein.newick
+
+R
+library(dplyr)
+library(ggtree)
+tree1=read.tree("bac120.model.reroot.newick")
+tree2=read.tree("bac120.protein.newick")
+p1 <- ggtree(tree1)
+p2 <- ggtree(tree2)
+
+d1 <- p1$data
+d2 <- p2$data
+
+d2$x <- max(d2$x) - d2$x + max(d1$x) + 1 #翻转第二棵树
+d2$y <- d2$y + 8 #将第二棵树向上移动对齐
+p3 <- ggtree::rotate(p1,29) #旋转node，使两棵树拓扑结构一致
+
+pp <- p3 + geom_tiplab(offset=0.05) + geom_treescale()+ geom_highlight(node=25,fill="red")+ geom_tree(data=d2) + geom_tiplab(data = d2, hjust=1, offset =-0.05)+geom_treescale(x=2)
+
+#geom_tiplab(offset=0.05) 添加label，offset：label与树枝末端距离
+#geom_treescale() #添加表尺
+#geom_highlight(node=25,fill="red") #添加红色区域
+```
+![](./IMG/species_protein.png)
 
 ![](./IMG/LABEL.png)
 
