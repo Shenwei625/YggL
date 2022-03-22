@@ -622,14 +622,7 @@ cd seed1
 cat ../out_file | cut -f 1 > seed1.lst
 faops ../../PROTEINS/all.replace.fa seed1.lst seed1_raw.fa
 
-#一些序列名称太长，无法建库，删去，只保留一个序列seed1
-cat seed1_raw.fa | grep -v ">" > seed1.fa
-(echo -e ">seed1" && cat seed1.fa) \
-    > tem &&
-    mv tem seed1.fa
-#cat seed1.fa | wc -l  2625
-#cat seed1.lst |wc -l 1312
-#cat seed1_raw.fa | wc -l 3936
+#一些序列名称太长，无法建库，需要对序列名称进行修改再进行建库
 
 makeblastdb -in ./seed1.fa -dbtype prot -parse_seqids -out ./index
 
@@ -687,9 +680,6 @@ tsv-join --filter-file species_number.tsv \
     species_assembly.tsv \
     > table.tsv
 
-cat table.tsv | tr "\t" "," > table.csv
-# 与hummsearch的结果基本一致
-在blastp（evalue：1e-10）中9株Shewanella putrefaciens存在12个拷贝而hummsearch结果显示为11个拷贝
 ```
 ## YggL蛋白树构建
 + 提取所有蛋白
