@@ -820,7 +820,16 @@ brew install motif
 ```
 >**简介**
 >
->MEME是一款用于研究Motif的组合工具套。MEME包含多个小工具，如MEME、STREME、 CentriMo、 AME、 FIMO、 Tomtom等等。MEME工具套的功能全面，包括 挖掘Motif（Motif Discovery）、富集 Motif（Motif Enrichment）、查询Motif（Motif Scanning）、比较Motif（Motif Comparison）。
+>   MEME是一款用于研究Motif的组合工具套。MEME包含多个小工具，如MEME、STREME、 CentriMo、 AME、 FIMO、 Tomtom等等。MEME工具套的功能全面，包括挖掘Motif（Motif Discovery）、富集Motif（Motif Enrichment）、查询Motif（Motif Scanning）、比较Motif（Motif Comparison）。
+>    
+>   (一) motif discovery
+>
+>   挖掘 Motif 是指：MEME 基于用户所提供的序列，根据特定的算法，预测（Predict） 序列中可能包含的 Motif。需要注意的是，挖掘 Motif 的算法不是将序列与数据库中已知的 Motif 比对，也不是用已知的 Motif 模型对序列进行扫描（Scanning），而是基于用于提供的序列信息独立计算出的，即全新的Motif。
+
+输入：Fasta 序列
+输出：序列中 预测包含 的 Motif
+>
+>
 >
 >
 + MEME的使用
