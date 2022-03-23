@@ -829,6 +829,7 @@ brew install MEME
 >   输入：Fasta 序列;输出：序列中预测包含的Motif
 >
 >   （二）motif enrichment
+>   
 >   富集 Motif 是指：以一组序列为对照组，挖掘在另一组序列中富集且已知的 Motif。
 >
 >   输入：Fasta 序列;输出：序列中富集且已知的 Motif   
@@ -840,6 +841,7 @@ brew install MEME
 >   输入：Motif 模型;输出：包含 Motif 的序列
 >
 >   （四）motif comparision
+>   
 >   比较 Motif 是指：将用户上传的 Motif 与数据库中已知的 Motif 比较，筛选出与上传 Motif 相似的已知 Motif。可以将挖掘 Motif 模块找到的 Motif 作为输入，寻找数据库中与其相似的 Motif，预测挖掘到 Motif 的功能。 注意，AME 的输入是序列，Tomtom 的输入是 Motif。
 >
 >   输入：Motif 模型;输出：已知 的 Motif 模型
