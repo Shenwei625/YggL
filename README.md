@@ -849,5 +849,15 @@ brew install MEME
 >   工具：Tomtom
 + MEME的使用
 ```bash
-
+# motif discovery
+meme data.fa -protein -oc output -nostatus -time 14400 -mod zoops -nmotifs 3 -minw 6 -maxw 50 -objfun classic -markov_order 0
+# -protein:sequences use protein alphabet
+# -oc:name of directory for output file,will replace existing directory
+# -nostatus:do not print progress reports to terminal
+# -time:quit before <t> CPU seconds consumed
+# -mod zoops:distribution of motifs,zoops/oops/anr
+# -nmotifs:maximum number of motifs to find
+# -min/maxw 6:minimum/maximum motif width
+# -objfun:objective function (default: classic)
+# -markov_order:(maximum) order of Markov model to use or create
 ```
