@@ -818,10 +818,11 @@ motif这个单词形容一种反复出现的模式，而序列motif往往是DNA�
 ```bash
 brew install motif
 ```
->>**简介**<<
+>**简介**
 >
-
-
+>MEME是一款用于研究Motif的组合工具套。MEME包含多个小工具，如MEME、STREME、 CentriMo、 AME、 FIMO、 Tomtom等等。MEME工具套的功能全面，包括 挖掘Motif（Motif Discovery）、富集 Motif（Motif Enrichment）、查询Motif（Motif Scanning）、比较Motif（Motif Comparison）。
+>
+>
 + MEME的使用
 ```bash
 
