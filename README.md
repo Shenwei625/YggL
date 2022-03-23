@@ -825,12 +825,12 @@ brew install MEME
 >   (一) motif discovery
 >
 >   挖掘 Motif 是指：MEME 基于用户所提供的序列，根据特定的算法，预测（Predict） 序列中可能包含的 Motif。需要注意的是，挖掘 Motif 的算法不是将序列与数据库中已知的 Motif 比对，也不是用已知的 Motif 模型对序列进行扫描（Scanning），而是基于用于提供的序列信息独立计算出的，即全新的Motif。MEME是最基本的挖掘 Motif 模块，可以在少量（<50）的序列中挖掘全新（novel）、无间隙（ungapped）的Motif；STREME相比MEME可以在大量（>50） 的序列中挖掘全新、无间隙、富集的Motif。
-
+>
 >   输入：Fasta 序列;输出：序列中预测包含的Motif
 >
 >   （二）motif enrichment
 >   富集 Motif 是指：以一组序列为对照组，挖掘在另一组序列中富集且已知的 Motif。
-
+>
 >   输入：Fasta 序列;输出：序列中富集且已知的 Motif   
 >
 >   （三）motif scanning
