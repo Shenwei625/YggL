@@ -613,6 +613,8 @@ EOF
 makeblastdb -in ./yggl.fa -dbtype prot -parse_seqids -out ./index
 
 blastp -query ../PROTEINS/all.replace.fa -db ./index -evalue 1e-10 -outfmt 6 -num_threads 6 -out out_file
+
+cat out_file | wc -l # 1312
 ```
 + 以第一次检索结果为种子序列，进一步进行检索
 ```bash
@@ -626,7 +628,9 @@ faops ../../PROTEINS/all.replace.fa seed1.lst seed1_raw.fa
 
 makeblastdb -in ./seed1.fa -dbtype prot -parse_seqids -out ./index
 
-blastp -query ../../PROTEINS/all.replace.fa -db ./index -evalue 1e-5 -outfmt 6 -num_threads 6 -out out_file
+blastp -query ../../PROTEINS/all.replace.fa -db ./index -evalue 1e-10 -outfmt 6 -num_threads 6 -out out_file
+
+cat out_ file | cut -f 1 | uniq | wc -l #1312
 ```
 
 + blastp统计
@@ -804,6 +808,17 @@ pp <- p3 + geom_tiplab(offset=0.05) + geom_treescale()+ geom_highlight(node=25,f
 ![](./IMG/YGGL.png)
 
 在物种树中铜绿假单胞菌（红色）聚到一支上，而在蛋白树中，铜绿假单胞菌中的YggL蛋白却明显分为两支
-### Ka/Ks的测定
+### 查找motif
 
++ motif简介
 
+motif这个单词形容一种反复出现的模式，而序列motif往往是DNA上的反复出现的比较有特征的短序列，并被假设拥有生物学功能。而且，经常是一些具有序列特异性的蛋白的结合位点（如，转录因子）或者是涉及到重要生物过程的（如，RNA 起始，RNA 终止， RNA 剪切等等）
+
++ MEME的安装
+```bash
+brew install motif
+```
++ MEME的使用
+```bash
+
+```
