@@ -596,8 +596,44 @@ cat table.tsv | tr "\t" "," > table.csv
 ```
 + 筛选
 ```bash
-cat table.tsv | tsv-filter -H --ge 2:5 > ge5.tsv
+# 组装数大于5的
+cat table.tsv | tsv-filter -H --ge 2:5 | sed '1d' > ge5.tsv
 
+# 平均数大于1或者小于1的+Azotobacter vinelandii
+cat << 'EOF' > average.lst
+Pseudomonas citronellolis
+Pseudomonas knackmussii
+Pseudomonas aeruginosa
+Pseudomonas plecoglossicida
+Pseudomonas arsenicoxydans
+Shewanella cyperi
+Pseudomonas mandelii
+Shewanella putrefaciens
+Pseudomonas chlororaphis
+Pseudomonas viridiflava
+Pseudomonas putida
+Azotobacter vinelandii
+Pseudomonas fiuorescens
+EOF
+cat table.tsv | grep -f average.lst > average.tsv 
+
+# 两种筛选条件取并集
+cat ge5.tsv | grep -f average.tsv > intersection.tsv #交集
+cat ge5.tsv | grep -v -f intersection.tsv > rest1.tsv
+cat average.tsv | grep -v -f intersection.tsv > rest2.tsv
+
+(echo -e "species\tnumber of assemblies\tnumber of yggl" && cat intersection.tsv) \
+    > tem &&
+    mv tem intersection.tsv
+
+# 将其余的物种合并为other species
+cat intersection.tsv | cut -f 1 | sed '1d' > select.lst
+
+cat table.tsv | grep -v -f select.lst | cut -f 2,3 > other_species.tsv
+
+cat other_species.tsv | tr "\t" "," > other_species.csv
+
+cat intersection.tsv | tr "\t" "," | sort -nr -k2,2 > terminal.csv
 ```
 ### Blastp
 + 第一次检索
