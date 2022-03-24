@@ -597,6 +597,7 @@ cat table.tsv | tr "\t" "," > table.csv
 + 筛选
 ```bash
 cat table.tsv | tsv-filter -H --ge 2:5 > ge5.tsv
+
 ```
 ### Blastp
 + 第一次检索
@@ -866,3 +867,8 @@ faops some pseudom_aer.yggl.fa yggl1.lst yggl2.fa
 ```
 + [网页版](https://meme-suite.org/meme/)使用
 
+![](./IMG/motif1.png)
+
+分别上传yggl.fa与yggl2.fa
+
++ 结果分析
