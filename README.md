@@ -808,7 +808,8 @@ pp <- p3 + geom_tiplab(offset=0.05) + geom_treescale()+ geom_highlight(node=25,f
 ![](./IMG/YGGL.png)
 
 在物种树中铜绿假单胞菌（红色）聚到一支上，而在蛋白树中，铜绿假单胞菌中的YggL蛋白却明显分为两支
-### 查找motif
+
+### 比较铜绿假单胞菌两个yggl蛋白的motif
 
 + motif简介
 
@@ -849,17 +850,19 @@ brew install MEME
 >   工具：Tomtom
 + MEME的使用
 ```bash
-# motif discovery
-meme data.fa -protein -oc output -nostatus -time 14400 -mod zoops -nmotifs 3 -minw 6 -maxw 50 -objfun classic -markov_order 0
-# -protein:sequences use protein alphabet
-# -oc:name of directory for output file,will replace existing directory
-# -nostatus:do not print progress reports to terminal
-# -time:quit before <t> CPU seconds consumed
-# -mod zoops:distribution of motifs,zoops/oops/anr
-# -nmotifs:maximum number of motifs to find
-# -min/maxw 6:minimum/maximum motif width
-# -objfun:objective function (default: classic)
-# -markov_order:(maximum) order of Markov model to use or create
+# 分离铜绿假单胞菌的两个yggl蛋白
+mkdir ~/data/Pseudomonas/motif
+cd ~/data/Pseudomonas/motif
+
+cat ../blastp/seed2/out_file | cut -f 1 | grep "Pseudom_aer" > pseudom_aer.lst #777
+faops some ../PROTEINS/all.replace.fa pseudom_aer.lst pseudom_aer.yggl.fa
+faops size pseudom_aer.yggl.fa | head # 观察到两个拷贝的长度不一样，一个是144，一个是120
+
+# 分离
+faops size pseudom_aer.yggl.fa | tsv-filter --le 2:144 | cut -f 1 > yggl1.fa #389
+faops size pseudom_aer.yggl.fa | tsv-filter --gt 2:144 | cut -f 1 > yggl2.fa #388
+faops some pseudom_aer.yggl.fa yggl1.lst yggl1.fa
+faops some pseudom_aer.yggl.fa yggl1.lst yggl2.fa
 ```
 + [网页版](https://meme-suite.org/meme/)使用
 
