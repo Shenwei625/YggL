@@ -887,19 +887,9 @@ brew install MEME
 >   工具：Tomtom
 + MEME的使用
 ```bash
-# 分离铜绿假单胞菌的两个yggl蛋白
-mkdir ~/data/Pseudomonas/motif
-cd ~/data/Pseudomonas/motif
+# 选取代表性菌株，分离两种yggl序列
 
-cat ../blastp/seed2/out_file | cut -f 1 | grep "Pseudom_aer" > pseudom_aer.lst #777
-faops some ../PROTEINS/all.replace.fa pseudom_aer.lst pseudom_aer.yggl.fa
-faops size pseudom_aer.yggl.fa | head # 观察到两个拷贝的长度不一样，一个是144，一个是120
 
-# 分离
-faops size pseudom_aer.yggl.fa | tsv-filter --le 2:144 | cut -f 1 > yggl1.fa #389
-faops size pseudom_aer.yggl.fa | tsv-filter --gt 2:144 | cut -f 1 > yggl2.fa #388
-faops some pseudom_aer.yggl.fa yggl1.lst yggl1.fa
-faops some pseudom_aer.yggl.fa yggl1.lst yggl2.fa
 ```
 + [网页版](https://meme-suite.org/meme/)使用
 
