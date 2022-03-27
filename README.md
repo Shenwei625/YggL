@@ -952,4 +952,4 @@ faops some data.fa yggl2.lst yggl2.fa
 
 + 查找yggl第二个拷贝的蛋白编号或者位置
 
-
+根据blastp结果，ncbi检索PAO1中两个yggl蛋白的编号NP_250533(120)和NP_251736(114),蛋白编号分别为PA1842(NP_250533)和PA3046(NP_251736)
