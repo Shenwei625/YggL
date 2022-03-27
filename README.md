@@ -922,7 +922,7 @@ faops some data.fa yggl2.lst yggl2.fa
 
 ![](./IMG/interpro.png)
 
-更具之前motif的位置查看motif在蛋白中的位置
+根据之前motif的位置查看motif在蛋白中的位置
 
 ### 观察yggl蛋白的侧翼基因
 + 利用[Pseudomonas Genome DB](https://www.pseudomonas.com/)网站，查询yggl蛋白
@@ -930,5 +930,26 @@ faops some data.fa yggl2.lst yggl2.fa
 ![](./IMG/pseudomonas_db.png)
 
 ### 基因岛分析
++ 在[Islandviewer4网站](https://www.pathogenomics.sfu.ca/islandviewer/upload/)中上传PAO1的genbank文件
+
+![](./IMG/island1.png)
+
++ 结果分析
+
+圈图展示基因组上预测出的基因岛的分布、位置、不同颜色表示对应的分析方法，圈图的内圈是基因组G+C含量的变化，一般基因岛的G+C含量会显著偏离基因组G+C含量的平均水平。
+
+圆圈图下面的方块图中，最上面两行方块展示了注释的蛋白，下面的三行方块表示不同分析方法对应的基因岛区域。
+
+圆圈中的圆点代表毒力因子，抗性基因等。点击downkoad下载基因岛区域的相关信息
+
+![](./IMG/island_result.png)
+
++ 查找yggl蛋白是否在预测的基因岛区域
+
+通过Pseudomonas Genome DB网站，我们了解，yggl蛋白的编号为PA3046，在基因岛区域中并未查询到PA3046蛋白？？
+
+PA3046为铜绿假单胞菌中的第一个拷贝，并非通过水平基因转移而来，而第二个拷贝可能是通过水平基因转移而来
+
++ 查找yggl第二个拷贝的蛋白编号
 
 
