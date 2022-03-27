@@ -897,9 +897,17 @@ cat data.size.tsv | grep -f representative.lst | sort -nr -k2,2 > representative
 ```
 + 根据进化树分离两种不同的拷贝
 
-![](./IMG/motif1.png)
+![](./IMG/phylo.png)
 
+红色区域为yggl的第二个拷贝
 
+```bash
+cat representative.pro.lst | tsv-filter --gt 2:115 | grep -v "She_fle_2a_301_NP_708730" > yggl2.lst
+cat representative.pro.lst | grep -v -f yggl2.lst | cut -f 1 > yggl1.lst
+
+faops some data.fa yggl1.lst yggl1.fa
+faops some data.fa yggl2.lst yggl2.fa
+```
 + [网页版](https://meme-suite.org/meme/)使用
 
 ![](./IMG/motif1.png)
@@ -907,3 +915,20 @@ cat data.size.tsv | grep -f representative.lst | sort -nr -k2,2 > representative
 分别上传yggl.fa与yggl2.fa
 
 + 结果分析
+
+
+### 观察motif在yggl蛋白中的位置
++ 利用[Interpro](https://www.ebi.ac.uk/interpro/entry/InterPro/IPR007416/rosettafold/)网站查询yggl蛋白结构
+
+![](./IMG/interpro.png)
+
+更具之前motif的位置查看motif在蛋白中的位置
+
+### 观察yggl蛋白的侧翼基因
++ 利用[Pseudomonas Genome DB](https://www.pseudomonas.com/)网站，查询yggl蛋白
+
+![](./IMG/pseudomonas_db.png)
+
+### 基因岛分析
+
+
