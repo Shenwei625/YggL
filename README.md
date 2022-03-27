@@ -888,9 +888,18 @@ brew install MEME
 + MEME的使用
 ```bash
 # 选取代表性菌株，分离两种yggl序列
+cd ~/data/Pseudomonas/motif
+cat ../ASSEMBLY/Pseudomonas.assembly.pass.csv | grep "Representative Genome" > representative.csv
+cat representative.csv | cut -d "," -f 1 > representative.lst
+cat ../model/model.lst >> representative.lst
 
-
+cat data.size.tsv | grep -f representative.lst | sort -nr -k2,2 > representative.pro.lst
 ```
++ 根据进化树分离两种不同的拷贝
+
+
+
+
 + [网页版](https://meme-suite.org/meme/)使用
 
 ![](./IMG/motif1.png)
