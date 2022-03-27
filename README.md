@@ -897,7 +897,7 @@ cat data.size.tsv | grep -f representative.lst | sort -nr -k2,2 > representative
 ```
 + 根据进化树分离两种不同的拷贝
 
-
+![](./IMG/motif1.png)
 
 
 + [网页版](https://meme-suite.org/meme/)使用
