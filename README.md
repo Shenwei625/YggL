@@ -953,3 +953,34 @@ faops some data.fa yggl2.lst yggl2.fa
 + 查找yggl第二个拷贝的蛋白编号或者位置
 
 根据blastp结果，ncbi检索PAO1中两个yggl蛋白的编号NP_250533(120)和NP_251736(114),蛋白编号分别为PA1842(NP_250533)和PA3046(NP_251736)
+
+**结论**：两种蛋白在基因岛中均未找到，铜绿假单胞菌中的第二个yggl拷贝不是近期通过水平基因转移获得
+
+### Pangenome
+参考文献：[PPanGGOLiN: Depicting microbial diversity via a partitioned pangenome graph](https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1007732)
+
+```bash
+cd ~/data/Pseudomonas
+
+mkdir -p pangenome
+
+cat strains.lst |
+    grep "^Pseudom_aeru_" |
+    parallel --no-run-if-empty --linebuffer -k -j 4 '
+        GBFF=$(compgen -G "ASSEMBLY/{}/*_genomic.gbff.gz")
+
+        if [ "${GBFF}" == "" ]; then
+            exit;
+        fi
+
+        echo {}
+        compgen -G "ASSEMBLY/{}/*_genomic.gbff.gz"
+    ' |
+    paste - - \
+    > pangenome/Pseudom_aeru.gbff.list
+
+wc -l < pangenome/Pseudom_aeru.gbff.list
+# 391
+
+ppanggolin workflow --anno pangenome/Pseudom_aeru.gbff.list --cpu 8 -o pangenome/Pseudom_aeru
+```
