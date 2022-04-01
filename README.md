@@ -956,6 +956,75 @@ faops some data.fa yggl2.lst yggl2.fa
 
 **结论**：两种蛋白在基因岛中均未找到，铜绿假单胞菌中的第二个yggl拷贝不是近期通过水平基因转移获得
 
+### EasyFig
+
+```bash
+# 准备typical菌株的genbank数据和genome数据
+
+mkdir ~/data/Pseudomonas/easyfig
+cd ~/data/Pseudomonas/easyfig
+
+for S in \
+    Pseudom_aeru_PAO1 \
+    Pseudom_puti_KT2440_GCF_000007565_2 \
+    Pseudom_chl_aureofaciens_30_84_GCF_000281915_1 \
+    Pseudom_entomophi_L48_GCF_000026105_1 \
+    Pseudom_fluo_SBW25_GCF_000009225_2 \
+    Pseudom_prot_Pf_5_GCF_000012265_1 \
+    Pseudom_sav_pv_phaseolicola_1448A_GCF_000012205_1 \
+    Pseudom_stu_A1501_GCF_000013785_1 \
+    Pseudom_syr_pv_syringae_B728a_GCF_000012245_1 \
+    Pseudom_aeru_UCBPP_PA14_GCF_000014625_1 \
+    Pseudom_aeru_PA7_GCF_000017205_1 \
+    Pseudom_aeru_LESB58_GCF_000026645_1 \
+    ; do
+    echo ${S}
+done \
+    > typical.lst
+
+mkdir genbank
+cat typical.lst |
+    parallel --no-run-if-empty --linebuffer -k -j 4 '
+        compgen -G "../ASSEMBLY/{}/*_genomic.gbff.gz"
+    ' |
+    paste - - \
+    > genbank/genbank.list
+for G in $(cat genbank/genbank.lst);do
+    cp $G genbank
+done
+gzip -d genbank/*.gz
+
+mkdir genome
+cat typical.lst |
+    parallel --no-run-if-empty --linebuffer -k -j 4 '
+        compgen -G "../ASSEMBLY/{}/*_genomic.fna.gz" |
+        grep -v "from"
+    ' |
+    paste - - \
+    > genome/genome.list
+for G in $(cat genome/genome.lst);do
+    cp $G genome
+done
+```
+ + blastn
+ ```bash
+ mkdir blastn
+ 
+ gzip -dcf genome/*.gz > blastn/typical.fa
+ cat << 'EOF' > blastn/yggl.fa
+ >PA3046
+ATGGCTACTAATCGTTCCCGCCGCCTGCGCAAGAAATTGTGCGTCGATGAATTCCAGGAGCTGGGTTTCGAATTGAACTTCCACTACAAGGAAGGCGTGGATGCCGATGCGGTGAACGCTTTCATGTTGCGCTTCATCGATCAGGCGATCGAAGCCAACGAACTGACCTATGGCGGCTGCGACGAATTCGGTTTCGTCTGCCTGGCGCGCCGTGGCTCGGTCAATGAAGAGCAGCGGGCCCTGATCGAGGCCTGGTTGAAGCAGCAACCGGAACTGGCCAGCGTCGAGGTCGGCGCGTTGGTCGACGCCTGGTACCCGGAACAGCCTGTCCTGCCGAAGCTCTAA
+EOF
+
+cd blastn
+makeblastdb -in ./yggl.fa -dbtype nucl -parse_seqids -out ./index
+blastn -query ./typical.fa -db ./index -evalue 1e-10 -outfmt 6 -num_threads 6 -out out_file
+ ```
+
+
+
+
+
 ### Pangenome
 参考文献：[PPanGGOLiN: Depicting microbial diversity via a partitioned pangenome graph](https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1007732)
 
@@ -984,3 +1053,9 @@ wc -l < pangenome/Pseudom_aeru.gbff.list
 
 ppanggolin workflow --anno pangenome/Pseudom_aeru.gbff.list --cpu 8 -o pangenome/Pseudom_aeru
 ```
++ 下载Gephi
+
+打开pangenomeGraph.gexf,分布方式：ForceAtlas 2
+
+参数:缩放 8000；更强的重力 打开；重力 1.87；边的权重影响 1.05
+
