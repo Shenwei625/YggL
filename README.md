@@ -1005,18 +1005,14 @@ cat typical.lst |
 for G in $(cat genome/genome.lst);do
     cp $G genome
 done
+gzip -d genome/*.gz
 ```
+ 
  + blastn
  ```bash
- mkdir blastn
- 
- gzip -dcf genome/*.gz > blastn/typical.fa
- cat << 'EOF' > blastn/yggl.fa
- >PA3046
-ATGGCTACTAATCGTTCCCGCCGCCTGCGCAAGAAATTGTGCGTCGATGAATTCCAGGAGCTGGGTTTCGAATTGAACTTCCACTACAAGGAAGGCGTGGATGCCGATGCGGTGAACGCTTTCATGTTGCGCTTCATCGATCAGGCGATCGAAGCCAACGAACTGACCTATGGCGGCTGCGACGAATTCGGTTTCGTCTGCCTGGCGCGCCGTGGCTCGGTCAATGAAGAGCAGCGGGCCCTGATCGAGGCCTGGTTGAAGCAGCAACCGGAACTGGCCAGCGTCGAGGTCGGCGCGTTGGTCGACGCCTGGTACCCGGAACAGCCTGTCCTGCCGAAGCTCTAA
-EOF
-
+mkdir blastn
 cd blastn
+
 makeblastdb -in ./yggl.fa -dbtype nucl -parse_seqids -out ./index
 blastn -query ./typical.fa -db ./index -evalue 1e-10 -outfmt 6 -num_threads 6 -out out_file
  ```
