@@ -1008,14 +1008,7 @@ done
 gzip -d genome/*.gz
 ```
  
- + blastn
- ```bash
-mkdir blastn
-cd blastn
-
-makeblastdb -in ./yggl.fa -dbtype nucl -parse_seqids -out ./index
-blastn -query ./typical.fa -db ./index -evalue 1e-10 -outfmt 6 -num_threads 6 -out out_file
- ```
+ + 输入菌株的genbank文件选择所需要对比的基因区域，利用easyfig进行blast比对
 
 
 
