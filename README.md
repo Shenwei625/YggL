@@ -1013,7 +1013,7 @@ gzip -d genome/*.gz
 
 ![](./IMG/easyfig_c.png)
 
-![](./IMG/yggl2.png)
+![](./IMG/yggl2.bmp)
 
 ### Pangenome
 参考文献：[PPanGGOLiN: Depicting microbial diversity via a partitioned pangenome graph](https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1007732)
