@@ -1007,12 +1007,13 @@ for G in $(cat genome/genome.lst);do
 done
 gzip -d genome/*.gz
 ```
- 
- + 输入菌株的genbank文件选择所需要对比的基因区域，利用easyfig进行blast比对
++ 输入菌株的genbank文件选择所需要对比的基因区域(Image-Subregions)，利用easyfig进行blast（Image-Blast）比对
 
++ 修改菌株的genbank文件，在特定的基因数据下面添加/colour=RGB色码，可以再最终的比较图中显示
 
+![](./IMG/easyfig_c.png)
 
-
+![](./IMG/yggl2.png)
 
 ### Pangenome
 参考文献：[PPanGGOLiN: Depicting microbial diversity via a partitioned pangenome graph](https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1007732)
@@ -1046,5 +1047,5 @@ ppanggolin workflow --anno pangenome/Pseudom_aeru.gbff.list --cpu 8 -o pangenome
 
 打开pangenomeGraph.gexf,分布方式：ForceAtlas 2
 
-参数:缩放 8000；更强的重力 打开；重力 1.87；边的权重影响 1.05
+参数:缩放 8000；更强的重力 打开；重力 2；边的权重影响 1.2；过滤-范围-nb gene long（节点） >7
 
