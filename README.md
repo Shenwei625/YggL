@@ -993,19 +993,6 @@ for G in $(cat genbank/genbank.lst);do
     cp $G genbank
 done
 gzip -d genbank/*.gz
-
-mkdir genome
-cat typical.lst |
-    parallel --no-run-if-empty --linebuffer -k -j 4 '
-        compgen -G "../ASSEMBLY/{}/*_genomic.fna.gz" |
-        grep -v "from"
-    ' |
-    paste - - \
-    > genome/genome.list
-for G in $(cat genome/genome.lst);do
-    cp $G genome
-done
-gzip -d genome/*.gz
 ```
 + 输入菌株的genbank文件选择所需要对比的基因区域(Image-Subregions)，利用easyfig进行blast（Image-Blast）比对
 
