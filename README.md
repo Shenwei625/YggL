@@ -1036,3 +1036,16 @@ ppanggolin workflow --anno pangenome/Pseudom_aeru.gbff.list --cpu 8 -o pangenome
 
 参数:缩放 8000；更强的重力 打开；重力 2；边的权重影响 1.2；过滤-范围-nb gene long（节点） >7
 
+### WGCNA
+
++ 获得基因表达矩阵
+
+在pseudomonas db网站中查看PAO1菌株的expression界面，下载soft文件
+
+编辑soft文件，保留其中的距离矩阵
+
++ 利用R中的WGCNA包进行分析
+
+```R
+
+```
