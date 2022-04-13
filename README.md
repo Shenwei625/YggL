@@ -1042,10 +1042,186 @@ ppanggolin workflow --anno pangenome/Pseudom_aeru.gbff.list --cpu 8 -o pangenome
 
 在pseudomonas db网站中查看PAO1菌株的expression界面，下载soft文件
 
-编辑soft文件，保留其中的距离矩阵
+编辑soft文件，保留其中的距离矩阵，删除其中含有表达量为null的菌株
 
 + 利用R中的WGCNA包进行分析
 
 ```R
+library(WGCNA)
+library(reshape2)
+library(stringr)
+
+options(stringsAsFactors = FALSE)
+enableWGCNAThreads()
+
+exprMat <- "GDS1469.soft"
+dataExpr <- read.table(exprMat, sep='\t', row.names=1, header=T,
+                     quote="", comment="", check.names=F)
+
+type = "signed"
+corType = "bicor"
+
+dim(dataExpr)
+head(dataExpr)[,1:5]
+
+dataExpr <- as.data.frame(t(dataExpr[,-1]))
+head(dataExpr)[,1:5]
+dim(dataExpr)
+
+powers = c(c(1:10), seq(from = 12, to=30, by=2))
+sft = pickSoftThreshold(dataExpr, powerVector=powers,
+                        networkType=type, verbose=5)
+
+power = sft$powerEstimate
+power
+
+nGenes = ncol(dataExpr)
+nSamples = nrow(dataExpr)
+if (is.na(power)){
+  power = ifelse(nSamples<20, ifelse(type == "unsigned", 9, 18),
+          ifelse(nSamples<30, ifelse(type == "unsigned", 8, 16),
+          ifelse(nSamples<40, ifelse(type == "unsigned", 7, 14),
+          ifelse(type == "unsigned", 6, 12))
+          )
+          )
+}
+
+net = blockwiseModules(dataExpr, power = power, maxBlockSize = nGenes,
+                       TOMType = type, minModuleSize = 100,
+                       reassignThreshold = 0, mergeCutHeight = 0.3,
+                       numericLabels = TRUE, pamRespectsDendro = FALSE,
+                       saveTOMs = TRUE, corType = corType,
+                       loadTOMs = TRUE,
+                       saveTOMFileBase = paste0(exprMat, ".tom"),
+                      verbose = 3)
+table(net$colors)
+
+moduleLabels = net$colors
+moduleColors = labels2colors(moduleLabels)
+plotDendroAndColors(net$dendrograms[[1]], moduleColors[net$blockGenes[[1]]],
+                    "Module colors",
+                    dendroLabels = FALSE, hang = 0.03,
+                    addGuide = TRUE, guideHang = 0.05)
+
+MEs = net$MEs
+MEs_col = MEs
+colnames(MEs_col) = paste0("ME", labels2colors(
+  as.numeric(str_replace_all(colnames(MEs),"ME",""))))
+MEs_col = orderMEs(MEs_col)
+plotEigengeneNetworks(MEs_col, "Eigengene adjacency heatmap",
+                      marDendro = c(3,3,2,4),
+                      marHeatmap = c(3,4,2,2), plotDendrograms = T,
+                      xLabelsAngle = 90)
+
+load(net$TOMFiles[1], verbose=T)
+TOM <- as.matrix(TOM)
+probes = colnames(dataExpr)
+dimnames(TOM) <- list(probes, probes)
+cyt = exportNetworkToCytoscape(TOM,
+             nodeFile = paste(exprMat, ".nodes.txt", sep=""),
+             weighted = TRUE, threshold = 0,
+             nodeNames = probes, nodeAttr = moduleColors)
 
 ```
++ 提取样本中与yggl拷贝在一个基因集的基因
+```bash
+mkdir ~/data/Pseudomonas/WGCNA/select
+cd ~/data/Pseudomonas/WGCNA/select
+
+cp ./*.txt ./ 
+JOB=$(ls | cut -d "." -f 1)
+
+for J in $JOB;do 
+    YGGL1=$(cat $J.soft.nodes.txt | grep "PA1842" | cut -f 3)
+    YGGL2=$(cat $J.soft.nodes.txt | grep "PA3046" | cut -f 3) 
+    cat $J.soft.nodes.txt | grep "$YGGL1" >> $J.select.txt
+    cat $J.soft.nodes.txt | grep "$YGGL2" >> $J.select.txt
+    done
+
+#用上述方法提取基因集是，发现在GDS1469中，提取黄色（yellow）基因集时，也提取出了黄绿色（greenyellow）基因集，重新筛选一下
+cat GDS1469.select.txt | grep -v "greenyellow"  \
+    > tem &&
+    mv tem GDS1469.select.txt
+```
+
++ 筛选
+
+标准：这个基因出现的频率为50%
+```bash
+# 有些样本中，两个拷贝在一个基因集中，可能会统计两次，需要进行一下筛选
+for J in $JOB;do 
+    NUMBER=$(cat $J.select.txt | grep "PA1842" | wc -l)
+    echo -e "$J\t$NUMBER"
+done    
+GDS1469 1
+GDS1910 1
+GDS2111 1
+GDS2317 1
+GDS2377 1
+GDS2502 1
+GDS2869 1
+GDS2870 1
+GDS2893 2
+GDS3251 1
+GDS3572 2
+GDS4244 1
+GDS4249 2
+GDS4250 1
+GDS4254 2
+GDS4457 1
+GDS4479 1
+GDS4958 1
+GDS4959 1
+# GDS2893,GDS3572,GDS4249,GDS4254这些样本中，两个拷贝聚在了一起，统计了两次，需要进行一下删减
+for PROJECT in GDS2893 GDS3572 GDS4249 GDS4254;do
+    cat $PROJECT.select.txt | sort | uniq > tem &&
+    mv tem $PROJECT.select.txt
+    done
+# 检验
+for J in $JOB;do 
+    NUMBER=$(cat $J.select.txt | grep "PA1842" | wc -l)
+    echo -e "$J\t$NUMBER"
+done    
+
+# 合并
+for J in $JOB;do 
+    YGGL1=$(cat $J.select.txt | grep "PA1842" | cut -f 3)
+    YGGL2=$(cat $J.select.txt | grep "PA3046" | cut -f 3) 
+    cat $J.select.txt | grep "$YGGL1" >> PA1842.select.txt
+    cat $J.select.txt | grep "$YGGL2" >> PA3046.select.txt
+done
+
+# 删去灰色基因集
+cat PA1842.select.txt | grep -v "grey"  \
+    > tem &&
+    mv tem PA1842.select.txt
+    
+cat PA3046.select.txt | grep -v "grey"  \
+    > tem &&
+    mv tem PA3046.select.txt
+
+# 统计不同基因出现的次数
+cat PA1842.select.txt | cut -f 1 > statistic.txt
+perl statistics.pl
+rm statistic.txt
+mv RESULT.txt PA1842.statistic.txt
+cat PA1842.statistic.txt | grep "PA1842"
+# PA1842_at       15
+cat PA1842.statistic.txt | tsv-filter --ge 2:7 | wc -l #534
+cat PA1842.statistic.txt | tsv-filter --ge 2:8 | wc -l #153
+cat PA1842.statistic.txt | tsv-filter --ge 2:7 | cut -f 1 > PA1842.cluster.txt
+
+# 同理，找出出与PA3046聚在一起的基因 PA3046.cluster.txt
+cat PA3046.statistic.txt | grep "PA3046"
+# PA3046_at       17
+cat PA3046.statistic.txt | tsv-filter --ge 2:8 | wc -l #237
+cat PA3046.statistic.txt | tsv-filter --ge 2:9 | wc -l #68
+cat PA3046.statistic.txt | tsv-filter --ge 2:8 | cut -f 1 > PA3046.cluster.txt
+
+#取交集
+cat PA1842.cluster.txt | grep -f PA3046.cluster.txt > collect.txt
+```
+
++ GO与KEGG分析
+
+
