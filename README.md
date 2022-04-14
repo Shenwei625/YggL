@@ -1138,8 +1138,6 @@ for J in $JOB;do
     cat $J.soft.nodes.txt | grep "$YGGL2" >> $J.select.txt
     done
 
-#用上述方法提取基因集是，发现在GDS1469中，提取黄色（yellow）基因集时，也提取出了黄绿色（greenyellow）基因集，重新筛选一下
-
 ```
 
 + 修改
