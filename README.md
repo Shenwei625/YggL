@@ -1209,18 +1209,18 @@ cat PA1842.statistic.txt | grep "PA1842"
 # PA1842_at       15
 cat PA1842.statistic.txt | tsv-filter --ge 2:7 | wc -l #534
 cat PA1842.statistic.txt | tsv-filter --ge 2:6 | wc -l #1370
-cat PA1842.statistic.txt | tsv-filter --ge 2:7 | cut -f 1 > PA1842.cluster.txt
+cat PA1842.statistic.txt | tsv-filter --ge 2:6 | cut -f 1 > PA1842.cluster.txt
 
 # 同理，找出出与PA3046聚在一起的基因 PA3046.cluster.txt
 cat PA3046.statistic.txt | grep "PA3046"
 # PA3046_at       17
-cat PA3046.statistic.txt | tsv-filter --ge 2:8 | wc -l #237
+cat PA3046.statistic.txt | tsv-filter --ge 2:6 | wc -l #1513
 cat PA3046.statistic.txt | tsv-filter --ge 2:7 | wc -l #637
 cat PA3046.statistic.txt | tsv-filter --ge 2:7 | cut -f 1 > PA3046.cluster.txt
 
 #取交集
 cat PA1842.cluster.txt | grep -f PA3046.cluster.txt > collect.txt
-cat PA1842.cluster.txt | grep -f PA3046.cluster.txt | wc -l #71
+cat PA1842.cluster.txt | grep -f PA3046.cluster.txt | wc -l #173
 ```
 
 + GO与KEGG分析
