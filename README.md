@@ -1139,50 +1139,60 @@ for J in $JOB;do
     done
 
 #用上述方法提取基因集是，发现在GDS1469中，提取黄色（yellow）基因集时，也提取出了黄绿色（greenyellow）基因集，重新筛选一下
+
+```
+
++ 修改
+```bash
+# *.select.txt文件中，理论上应该是只含有两种颜色的基因集，如果含有一种，则可能是两个拷贝被聚在了一起，如果含有多种，手动查看筛选
+for J in $JOB;do
+    COLOUR=$(cat $J.select.txt | cut -f 3 | sort | uniq | wc -l)
+    echo -e "$J\t$COLOUR"
+    done
+
+GDS1469 3
+GDS1910 2
+GDS2111 2
+GDS2317 2
+GDS2377 1
+GDS2502 2
+GDS2764 2
+GDS2869 2
+GDS2870 1
+GDS2893 1
+GDS3251 2
+GDS3572 2
+GDS4244 2
+GDS4249 2
+GDS4250 2
+GDS4254 1
+GDS4457 2
+GDS4479 2
+GDS4958 2
+GDS4959 2
+
+# 用上述方法提取基因集是，发现在GDS1469中，提取黄色（yellow）基因集时，也提取出了黄绿色（greenyellow）基因集，重新筛选一下
 cat GDS1469.select.txt | grep -v "greenyellow"  \
     > tem &&
     mv tem GDS1469.select.txt
+
+# GDS2377,GDS2870,GDS2893,GDS4254这些样本中，两个拷贝聚在了一起，统计了两次，需要进行一下删减
+for PROJECT in GDS2377 GDS2870 GDS2893 GDS4254;do
+    cat $PROJECT.select.txt | sort | uniq > tem &&
+    mv tem $PROJECT.select.txt
+    done
+
+# 检验
+for J in $JOB;do 
+    NUMBER=$(cat $J.select.txt | grep "PA1842" | wc -l)
+    echo -e "$J\t$NUMBER"
+done    
 ```
 
 + 筛选
 
 标准：这个基因出现的频率为50%
 ```bash
-# 有些样本中，两个拷贝在一个基因集中，可能会统计两次，需要进行一下筛选
-for J in $JOB;do 
-    NUMBER=$(cat $J.select.txt | grep "PA1842" | wc -l)
-    echo -e "$J\t$NUMBER"
-done    
-GDS1469 1
-GDS1910 1
-GDS2111 1
-GDS2317 1
-GDS2377 1
-GDS2502 1
-GDS2869 1
-GDS2870 1
-GDS2893 2
-GDS3251 1
-GDS3572 2
-GDS4244 1
-GDS4249 2
-GDS4250 1
-GDS4254 2
-GDS4457 1
-GDS4479 1
-GDS4958 1
-GDS4959 1
-# GDS2893,GDS3572,GDS4249,GDS4254这些样本中，两个拷贝聚在了一起，统计了两次，需要进行一下删减
-for PROJECT in GDS2893 GDS3572 GDS4249 GDS4254;do
-    cat $PROJECT.select.txt | sort | uniq > tem &&
-    mv tem $PROJECT.select.txt
-    done
-# 检验
-for J in $JOB;do 
-    NUMBER=$(cat $J.select.txt | grep "PA1842" | wc -l)
-    echo -e "$J\t$NUMBER"
-done    
-
 # 合并
 for J in $JOB;do 
     YGGL1=$(cat $J.select.txt | grep "PA1842" | cut -f 3)
