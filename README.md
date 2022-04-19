@@ -1231,6 +1231,77 @@ cat PA1842.cluster.txt | grep -f PA3046.cluster.txt > collect.txt
 cat PA1842.cluster.txt | grep -f PA3046.cluster.txt | wc -l #173
 ```
 
-+ GO与KEGG分析
 
+### 合并所有的GEO文件
+```bash
+tsv-join --filter-file GDS1910.soft --H --key-fields ID_REF,IDENTIFIER --append-fields 'GSM*' GDS1469.soft > merge.soft
+```
 
+### 将表达矩阵按照实验条件拆分
+```bash
+mkdir ~/data/Pseudomonas/WGCNA/job
+cd job
+
+cat ../project/GDS1469.soft | cut -f 1,2 > head.soft
+tsv-join --filter-file GDS1469.soft --H --key-fields ID_REF,IDENTIFIER --append-fields GSM68692,GSM68693,GSM68694 head.soft > GDS1469.1.soft
+#以此类推，分出其余实验条件的表达矩阵
+rm head.soft
+
+#删除其中存在null的数据（直接删除整个样本）
+for J in $JOB;do
+    JUDGE=$(cat $J.soft | grep "null")
+    if [ ! -n "$JUDGE" ]; then
+        echo -e "$J is ok"
+    else
+        echo -e "$J need control"
+    fi
+done
+GDS1469_1 need control
+GDS1910_2 need control
+GDS2893_2 need control
+GDS3174_1 need control
+GDS3174_2 need control
+# GDS1469_1中null太多，直接删除
+rm GDS1469_1.soft
+
+cat GDS1910_2.soft | cut -f 1,2,4 \
+    > tem&&
+    mv tem GDS1910_2.soft
+
+cat GDS2893_2.soft | cut -f 1,2,5 \
+    > tem&&
+    mv tem GDS2893_2.soft
+
+cat GDS2893_2.soft | cut -f 1,2,5 \
+    > tem&&
+    mv tem GDS2893_2.soft
+    
+# GDS3174_1和GDS3174_2中null太多，直接删除
+rm GDS3174_1.soft GDS3174_2.soft
+```
+```R
+JOB <- list.files(path = ".")
+
+for(J in JOB) {
+    exprMat <- J
+    source("rest.r")
+}
+```
+
+### 俩俩组合
+```bash
+mkdir ~/data/Pseudomonas/WGCNA/finish
+mkdir ~/data/Pseudomonas/WGCNA/combine
+
+cd job
+for i in {1..110};do
+    COMBINE=$(ls | head -n 1)
+    NAME1=$(ls | head -n 1 | cut -d '.' -f 1)
+    mv $COMBINE ../finish
+    REST=$(ls)
+    for R in $REST;do
+        NAME2=$(echo $R | cut -d '.' -f 1)
+        tsv-join --filter-file $R --H --key-fields ID_REF,IDENTIFIER --append-fields 'GSM*' ../finish/$COMBINE > ../combine/$NAME1.$NAME2.soft
+    done
+done 
+```
