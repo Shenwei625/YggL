@@ -1308,20 +1308,21 @@ done
 ### 构建分布图和韦恩图
 + 分布图
 ```bash
-cat PA1842.gen.fre.tsv | cut -f 2 > sample_count.tsv
-awk '{print $0,"\tPA1842"}' sample_count.tsv > tem&&
-    mv tem sample_count.tsv
-sed "1 iSample_count\tID" -i sample_count.tsv
+cat PA1842.gen.fre.tsv | cut -f 2 > occurence_count.tsv
+awk '{print $0,"\tPA1842"}' occurence_count.tsv > tem&&
+    mv tem occurence_count.tsv
+sed "1 iOccurence_count\tID" -i occurence_count.tsv
 
-plotr hist sample_count.tsv \
+plotr hist occurence_count.tsv \
     -g 2 \
     -c 1 \
     --width 1 \
-    --xl "Sample_count" \
+    --yl "Number of genes" \
+    --xl "Occurence_count" \
     --ymm 0,400 --xmm 10,100 \
     --device pdf -o PA1842.pdf   
 ```
-![](./IMG/PA1842_count.png)
+![](./IMG/PA1842_gene.png)
 
 + 韦恩图
 ```bash
