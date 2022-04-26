@@ -1305,7 +1305,7 @@ for i in {1..110};do
     done
 done 
 ```
-### 构建分布图和韦恩图
+### 构建分布图、韦恩图、GO和KEGG分析图
 + 分布图
 ```bash
 cat PA1842.gen.fre.tsv | cut -f 2 > occurence_count.tsv
@@ -1330,6 +1330,6 @@ plotr venn PA1842.gen.lst PA3046.gen.lst --device png -o venn.png
 ```
 ![](./IMG/venn.png)
 
-
++ GO与KEGG分析
 
 
