@@ -1331,5 +1331,13 @@ plotr venn PA1842.gen.lst PA3046.gen.lst --device png -o venn.png
 ![](./IMG/venn.png)
 
 + GO与KEGG分析
+```bash
+
+```
+
+
+
+
+
 
 
