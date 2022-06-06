@@ -659,7 +659,7 @@ mkdir -p seed1
 cd seed1
 
 cat ../out_file | cut -f 1 > seed1.lst
-faops ../../PROTEINS/all.replace.fa seed1.lst seed1_raw.fa
+faops some ../../PROTEINS/all.replace.fa seed1.lst seed1_raw.fa
 
 #一些序列名称太长，无法建库，需要对序列名称进行修改再进行建库
 
